@@ -1,0 +1,4 @@
+Date: 170301
+1. Load package caret.
+2. run featurePlot with plot = 'density' on each variable. Significant variables are 6, 7, 8, 11, 21, 24, 28, 31.
+3. run findCorrelation to compute the correlation between the variables.  Variables 14, 15, 16 are heavily correlated.
