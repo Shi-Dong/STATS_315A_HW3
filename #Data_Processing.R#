@@ -1,0 +1,10 @@
+fileNameStr = '170302_Run_SVM'
+loopIndex = 1:3
+
+for (i in loopIndex){
+    fileName = paste0(fileNameStr, as.character(i))
+    con = file(fileName, 'r+b')
+    load(con)
+}
+file
+
