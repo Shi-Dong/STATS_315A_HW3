@@ -24,7 +24,7 @@ train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
 # Train the model via glmnet
 # glmGrid = expand.grid(alpha = seq(0 , 1, length = 5),
-                      lambda = 10^seq(-5, -1, length = 5))
+                      # lambda = 10^seq(-5, -1, length = 5))
 model.glmnet = train(default ~ ., data = data.train,
                      method = 'glmnet', trControl = train.control,
                      tuneGrid = glmGrid)
