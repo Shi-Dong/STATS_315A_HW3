@@ -22,9 +22,11 @@ data.train$default = as.factor(data.train$default)
 # Apply 10-fold cross validation
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
-# Train the model via glmnet
-# lmGrid = expand.grid(alpha = seq(0 , 1, length = 5),
-                      lambda = 10^seq(-5, -1, length = 5))
-model.glmnet = train(default ~ ., data = data.train,
-                     method = 'glmnet', trControl = train.control,
-                     tuneGrid = glmGrid)
+# Train the model via SVM (linear kernel)
+library(e1071)
+data.train.normal = preProcess(data.train, method = c('center', 'scale'))
+data.train.normal$default = data.train$default
+svmGrid0 = expand.grid(cost = 10^seq(svmGridStart , svmGridEnd, length = 5))
+model.svm0 = train(default ~ ., data = data.train,
+                   method = 'svmLinear2', trControl = train.control,
+                   tuneGrid = svmGrid0)
