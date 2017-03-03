@@ -30,8 +30,23 @@ model.glmnet = train(default ~ ., data = data.train,
                      tuneGrid = glmGrid)
 # Train the model via SVM (linear kernel)
 library(e1071)
+preProc = preProcess(data.train, method = c('center', 'scale'))
+data.train.normal = predict(preProc, data.train)
+svmGrid0 = expand.grid(cost = 10^seq(0 , 3, length = 5))
+model.svm0 = train(default ~ ., data = data.train.normal,
+                   method = 'svmLinear2', trControl = train.control)
+# Train the model via SVM (radial kernel)
+library(kernlab)
 data.train.normal = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal$default = data.train$default
-svmGrid0 = expand.grid(cost = 10^seq(0 , 3, length = 5))
-model.svm0 = train(default ~ ., data = data.train,
-                   method = 'svmLinear2', trControl = train.control)
+svmGrid1 = expand.grid(cost = 10^seq(0 , 3, length = 5))
+model.svm1 = train(default ~ ., data = data.train,
+                   method = 'svmRadialCost', trControl = train.control)
+# Train the model via SVM (polynomial kernel)
+library(kernlab)
+preProc = preProcess(data.train, method = c('center', 'scale'))
+data.train.normal$default = data.train$default
+svmGrid2 = expand.grid(degree = 2, scale = 1, C = c(0.25, 0.5, 1))
+model.svm2 = train(default ~ ., data = data.train,
+                   method = 'svmPoly', trControl = train.control,
+                   tuneGrid = svmGrid2)

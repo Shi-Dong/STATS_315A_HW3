@@ -24,9 +24,9 @@ train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
 # Train the model via SVM (linear kernel)
 library(e1071)
-data.train.normal = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal$default = data.train$default
+preProc = preProcess(data.train, method = c('center', 'scale'))
+data.train.normal = predict(preProc, data.train)
 svmGrid0 = expand.grid(cost = 10^seq(svmGridStart , svmGridEnd, length = 5))
-model.svm0 = train(default ~ ., data = data.train,
+model.svm0 = train(default ~ ., data = data.train.normal,
                    method = 'svmLinear2', trControl = train.control,
                    tuneGrid = svmGrid0)
