@@ -30,3 +30,4 @@ svmGrid0 = expand.grid(cost = 10^seq(svmGridStart , svmGridEnd, length = 5))
 model.svm0 = train(default ~ ., data = data.train.normal,
                    method = 'svmLinear2', trControl = train.control,
                    tuneGrid = svmGrid0)
+

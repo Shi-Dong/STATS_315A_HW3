@@ -22,7 +22,7 @@ data.train$default = as.factor(data.train$default)
 # Apply 10-fold cross validation
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
-# Train the model via SVM (linear kernel)
+# Train the model via SVM (polynomial kernel)
 library(kernlab)
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)

@@ -23,12 +23,11 @@ data.train$default = as.factor(data.train$default)
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
 # Train the model via glmnet
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-glmGrid = expand.grid(alpha = 1,
-                      lambda = 1)
-model.glmnet = train(default ~ ., data = data.train.normal,
-                     method = 'glmnet', trControl = train.control)
+glmGrid = expand.grid(alpha = seq(0 , 1, length = 5),
+                      lambda = 10^seq(-5, -1, length = 5))
+model.glmnet = train(default ~ ., data = data.train,
+                     method = 'glmnet', trControl = train.control,
+                     tuneGrid = glmGrid)
 # Train the model via SVM (linear kernel)
 library(e1071)
 preProc = preProcess(data.train, method = c('center', 'scale'))
@@ -51,11 +50,8 @@ svmGrid2 = expand.grid(degree = 2, scale = 1, C = c(0.02,0.05,0.1))
 model.svm2 = train(default ~ ., data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2)
-# Train the model via k-NN
+### Train the model via k-NN
+library(knn)
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
-knnGrid = expand.grid(k = 1:10)
-model.knn  = train(default ~ ., data = data.train.normal,
-                   method = 'knn', trControl = train.control,
-                   tuneGrid = knnGrid)
-
+knnGrid <- expand.grid()
