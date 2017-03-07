@@ -29,29 +29,36 @@ glmGrid = expand.grid(alpha = 1,
                       lambda = 1)
 model.glmnet = train(default ~ ., data = data.train.normal,
                      method = 'glmnet', trControl = train.control)
-# Train the model via SVM (linear kernel)
+
+### Train the model via SVM (linear kernel)
 library(e1071)
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
 svmGrid0 = expand.grid(cost = 10^seq(0 , 3, length = 5))
 model.svm0 = train(default ~ ., data = data.train.normal,
                    method = 'svmLinear2', trControl = train.control)
-# Train the model via SVM (radial kernel)
+
+### Train the model via SVM (radial kernel)
 library(kernlab)
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
 svmGrid1 = expand.grid(cost = 10^seq(0 , 3, length = 5))
 model.svm1 = train(default ~ ., data = data.train.normal,
                    method = 'svmRadialCost', trControl = train.control)
-# Train the model via SVM (polynomial kernel)
+
+### Train the model via SVM (polynomial kernel)
 library(kernlab)
+# Select only the significant variables.
+variables <- c(6, 7, 8, 11, 21, 24, 28, 31)
+data.train <- data.train[,variables]
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
-svmGrid2 = expand.grid(degree = 2, scale = 1, C = c(0.02,0.05,0.1))
+svmGrid2 = expand.grid(degree = 2, scale = 1, C = 1)
 model.svm2 = train(default ~ ., data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2)
-# Train the model via k-NN
+
+### Train the model via k-NN
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
 knnGrid = expand.grid(k = 1:10)
