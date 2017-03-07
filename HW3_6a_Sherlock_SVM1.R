@@ -28,7 +28,7 @@ train.control = trainControl(method = 'repeatedcv', number = 10,
 library(kernlab)
 preProc = preProcess(data.train, method = c('center', 'scale'))
 data.train.normal = predict(preProc, data.train)
-svmGrid1 = expand.grid(degree = 2, scale = 1, C = cost)
+svmGrid1 = expand.grid(C = cost)
 model.svm1 = train(default ~ ., data = data.train.normal,
                    method = 'svmRadialCost', trControl = train.control,
                    tuneGrid = svmGrid1)
