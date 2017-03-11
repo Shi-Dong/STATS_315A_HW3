@@ -1,68 +1,54 @@
-# Data cleaning and pre-processing
-data.train = read.csv('STATS_315A_HW3/loan_train.csv')
-data.train = data.train[complete.cases(data.train),]
-
-library(caret)
-library(glmnet)
-# Convert data frame to numeric matrix
-data.train.numeric = data.matrix(data.train)
-# Compute the correlation of variables
-corr = cor(data.train.numeric)
-# Purge the variables that are not correlated to anything (including the response)
-corr_max = apply(corr, 1, function(v) max(abs(v[-which.max(v)])))
-variable.index = 1:ncol(data.train)
-data.train = data.train[,-variable.index[corr_max<0.1]]
-# Find the heavily correlated variables
-corr_v = findCorrelation(corr, cutoff = .9)
-# Purge the correlated variables
-data.train = data.train[,-corr_v]
-# Convert the response into a factor
-data.train$default = as.factor(data.train$default)
+# This script trains all models with pre-determined parameters.
+# Every model is fed with data.train.normal
 
 # Apply 10-fold cross validation
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
-# Train the model via glmnet
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-glmGrid = expand.grid(alpha = 1,
-                      lambda = 1)
+
+### Train the model via glmnet
+glmGrid = expand.grid(alpha = 1, lambda = 0.0003268627)
 model.glmnet = train(default ~ ., data = data.train.normal,
-                     method = 'glmnet', trControl = train.control)
+                     method = 'glmnet', trControl = train.control,
+                     tuneGrid = glmGrid)
 
 ### Train the model via SVM (linear kernel)
 library(e1071)
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-svmGrid0 = expand.grid(cost = 10^seq(0 , 3, length = 5))
+svmGrid0 = expand.grid(cost = 1)
 model.svm0 = train(default ~ ., data = data.train.normal,
-                   method = 'svmLinear2', trControl = train.control)
+                   method = 'svmLinear2', trControl = train.control,
+                   tuneGrid = svmGrid0)
 
 ### Train the model via SVM (radial kernel)
 library(kernlab)
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-svmGrid1 = expand.grid(cost = 10^seq(0 , 3, length = 5))
+svmGrid1 = expand.grid(C = 9)
 model.svm1 = train(default ~ ., data = data.train.normal,
-                   method = 'svmRadialCost', trControl = train.control)
+                   method = 'svmRadialCost', trControl = train.control,
+                   tuneGrid = svmGrid1)
 
 ### Train the model via SVM (polynomial kernel)
 library(kernlab)
-# Select only the significant variables.
-variables <- c(6, 7, 8, 11, 21, 24, 28, 31)
-data.train <- data.train[,variables]
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-svmGrid2 = expand.grid(degree = 2, scale = 1, C = 1)
-model.svm2 = train(default ~ ., data = data.train.normal,
+svmGrid2 = expand.grid(degree = 2, scale = 1, C = 100)
+model.svm2 = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
+                   data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2)
 
 ### Train the model via k-NN
-preProc = preProcess(data.train, method = c('center', 'scale'))
-data.train.normal = predict(preProc, data.train)
-knnGrid = expand.grid(k = 1:10)
-model.knn  = train(default ~ ., data = data.train.normal,
+knnGrid = expand.grid(k = 1:15)
+model.knn  = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
+                   data = data.train.normal,
                    method = 'knn', trControl = train.control,
                    tuneGrid = knnGrid)
 
+### Train the model via step-QDA
+stepQdaGrid <- expand.grid(maxvar = 6, direction = 'forward')
+model.stepqda <- train(default ~ ., data = data.train.normal,
+                       method = 'stepQDA', trControl = train.control,
+                       tuneGrid = stepQdaGrid)
+
+### Train the model via GAM with smoothing splines
+library(gam)
+gamGrid <- expand.grid(df = 4)
+model.gam <- train(default ~ ., data = data.train.normal,
+                   method = 'gamSpline', trControl = train.control,
+                   tuneGrid = gamGrid)
