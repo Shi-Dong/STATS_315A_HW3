@@ -14,4 +14,4 @@ pred <- pred - 1
 pred.vote <- apply(pred, 1, mean)
 pred.vote[pred.vote<0.5] <- 0
 pred.vote[pred.vote>=0.5] <- 1
-accuracy <- sum(abs(pred.vote - as.numeric(as.character(data.train$default))))/nrow(data.train)
+error.rate <- sum(abs(pred.vote - as.numeric(as.character(data.train$default))))/nrow(data.train)
