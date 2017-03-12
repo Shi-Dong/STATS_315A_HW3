@@ -34,17 +34,16 @@ model.svm2 = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec
                    tuneGrid = svmGrid2)
 
 ### Train the model via k-NN
-knnGrid = expand.grid(k = 1:15)
+knnGrid = expand.grid(k = 5)
 model.knn  = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
                    data = data.train.normal,
                    method = 'knn', trControl = train.control,
                    tuneGrid = knnGrid)
 
-### Train the model via step-QDA
-stepQdaGrid <- expand.grid(maxvar = 6, direction = 'forward')
-model.stepqda <- train(default ~ ., data = data.train.normal,
-                       method = 'stepQDA', trControl = train.control,
-                       tuneGrid = stepQdaGrid)
+### Train the model via QDA
+model.qda <- train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status, 
+                   data = data.train.normal,
+                   method = 'qda', trControl = train.control)
 
 ### Train the model via GAM with smoothing splines
 library(gam)

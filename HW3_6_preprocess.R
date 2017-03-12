@@ -1,5 +1,9 @@
 # Data cleaning and pre-processing
-data.train = read.csv('STATS_315A_HW3/loan_train.csv')
+dataFileName <- ifelse(file.exists('loan_train.csv'), 
+                       'loan_train.csv',
+                       'STATS_315A_HW3/loan_train.csv')
+data.train <- read.csv(dataFileName)
+
 data.train = data.train[complete.cases(data.train),]
 
 library(caret)
