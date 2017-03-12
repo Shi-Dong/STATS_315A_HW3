@@ -4,7 +4,9 @@ model[[length(model) + 1]] <- model.qda
 model[[length(model) + 1]] <- model.glmnet
 model[[length(model) + 1]] <- model.svm0
 model[[length(model) + 1]] <- model.svm1
-model[[length(model) + 1]] <- model.knn
+model[[length(model) + 1]] <- model.svm2
+# model[[length(model) + 1]] <- model.knn
+model[[length(model) + 1]] <- model.gam
 
 pred <- matrix(0, ncol = length(model), nrow = nrow(data.train.normal))
 for (i in 1:length(model)){
