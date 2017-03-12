@@ -28,14 +28,14 @@ model.svm1 = train(default ~ ., data = data.train.normal,
                    tuneGrid = svmGrid1)
 print('radial SVM training complete!')
 
-### Train the model via SVM (polynomial kernel)
+### Train the model via SVM (2nd degree polynomial kernel)
 library(kernlab)
-svmGrid2 = expand.grid(degree = 2, scale = 1, C = 100)
+svmGrid2 = expand.grid(degree = 2, scale = 1, C = 77.4)
 model.svm2 = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
                    data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2)
-print('polynomial SVM training complete!')
+print('2nd degree polynomial SVM training complete!')
 
 ### Train the model via k-NN
 knnGrid = expand.grid(k = 5)
