@@ -1,6 +1,6 @@
 # Submitting SVM2 model to Sherlock to find the optimal parameters
 train.control = trainControl(method = 'repeatedcv', number = 10,
-                             repeats = 3)
+                             repeats = 3, classProbs = T)
 library(kernlab)
 svmGrid2 = expand.grid(degree = 2, scale = 1, C = cost)
 model.svm2.sweep = train(default ~ recover + coll_fee + out_prncp + fees_rec + 
