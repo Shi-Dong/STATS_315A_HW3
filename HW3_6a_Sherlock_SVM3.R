@@ -4,7 +4,8 @@ train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3)
 library(kernlab)
 svmGrid3 = expand.grid(degree = 3, scale = 1, C = cost)
-model.svm3.sweep = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
+model.svm3.sweep = train(default ~ recover + coll_fee + out_prncp + fees_rec + 
+                             last_payment + prin_rec,
                          data = data.train.normal,
                          method = 'svmPoly', trControl = train.control,
-                         tuneGrid = svmGrid3)
+                         tuneGrid = svmGrid3, metric = 'ROC')
