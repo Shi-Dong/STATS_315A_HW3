@@ -16,4 +16,7 @@ pred <- pred - 1
 pred.vote <- apply(pred, 1, mean)
 pred.vote[pred.vote<0.5] <- 0
 pred.vote[pred.vote>=0.5] <- 1
+pred.vote[data.train$recover!=0] <- 1
 error.rate <- sum(abs(pred.vote - as.numeric(as.character(data.train$default))))/nrow(data.train)
+error.index <- which(pred.vote != as.numeric(as.character(data.train$default)))
+error.data <- data.train[error.index,]
