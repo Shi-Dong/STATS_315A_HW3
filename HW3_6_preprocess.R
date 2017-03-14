@@ -38,3 +38,8 @@ data.train.normal[ind] <- lapply(data.train.normal[ind],
 preProc.train = preProcess(data.train.normal[,-1], method = c('center', 'scale'))
 data.train.normal[,-1] = predict(preProc.train, data.train.normal[,-1])
 data.train.normal$default <- data.train$default
+
+# Source the functions
+source('HW3_6a_Tune_Prob.R')
+source('HW3_6a_Test.R')
+source('HW3_6a_test_function.R')
