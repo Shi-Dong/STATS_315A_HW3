@@ -6,6 +6,9 @@ data.train <- read.csv(dataFileName)
 
 data.train = data.train[complete.cases(data.train),]
 
+levels(data.train$employment) <- c('< 1', '1', '2', '3', '4', '5', '6', '7',
+                                  '8', '9', '10+')
+
 library(caret)
 library(glmnet)
 # Convert data frame to numeric matrix
@@ -40,6 +43,5 @@ data.train.normal[,-1] = predict(preProc.train, data.train.normal[,-1])
 data.train.normal$default <- data.train$default
 
 # Source the functions
-source('HW3_6a_Tune_Prob.R')
-source('HW3_6a_Test.R')
-source('HW3_6a_test_function.R')
+source('STATS_315A_HW3/HW3_6a_Tune_Prob.R')
+source('STATS_315A_HW3/HW3_6_test.R')

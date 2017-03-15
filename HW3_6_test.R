@@ -11,7 +11,9 @@ predTest <- function(modelList,
                      dataSet = 'test'){
     if (dataSet == 'test'){
         data.test <- read.csv('STATS_315A_HW3/loan_testx.csv')
-        data.test <- data.test[complete.cases(data.test),]
+        levels(data.test$employment) <- c('< 1', '1', '2', '3', '4', '5', '6', '7',
+                                          '8', '9', '10+')
+        data.test$employment[is.na(data.test$employment)] <- sample(levels(data.test$employment), 1)
         ind <- sapply(data.test, is.factor)
         data.test[ind] <- lapply(data.test[ind], function(x) as.numeric(x)*1.0)
         data.test.normal <- predict(preProc.train, data.test)
@@ -43,4 +45,13 @@ predTest <- function(modelList,
         trainingError <- sum(abs(pred.vote - as.numeric(data.test.normal$default) + 1))/length(pred.vote)
         list('Final_Pred' = pred.vote, 'Training_Error' = trainingError)
     }
+}
+
+# The following function compares predicted values with observations
+#   pred is a vector with the same number of rows as data.train.
+#   every entry of pred is either 0 or 1.
+predError <- function(pred){
+    pred.error <- data.train$default[pred - as.numeric(data.train$default) + 1 != 0]
+    e <- length(pred.error) / length(pred)
+    list(cases = pred.error, rate = e)
 }

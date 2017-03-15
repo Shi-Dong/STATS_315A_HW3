@@ -17,18 +17,22 @@ optThreshold <- function(data, lev = NULL, model = NULL){
     c('Max_Accuracy' = 1-min.error, 'Opt_Threshold' = opt.threshold)
 }
 
+
 # Apply 10-fold cross validation
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3, classProbs = T,
-                             summaryFunction = optThreshold)
+                             summaryFunction = optThreshold,
+                             # down-sampling the data
+                             sampling = 'up')
 # Relabel the data
 levels(data.train.normal$default) <- c('X0', 'X1')
 
 ### Train the model via glmnet
-glmGrid = expand.grid(alpha = 1, lambda = 0.0003268627)
+glmGrid = expand.grid(alpha = 1, lambda = 10^seq(-7, -1, by = 1))
 model.glmnet = train(default ~ ., data = data.train.normal,
                      method = 'glmnet', trControl = train.control,
-                     tuneGrid = glmGrid, metric = 'Max_Accuracy')
+                     tuneGrid = glmGrid, 
+                     metric = 'Max_Accuracy')
 print('glmnet training complete!')
 
 ### Train the model via SVM (linear kernel)
@@ -75,7 +79,7 @@ print('GAM with smoothing splines training complete!')
 ### Train the model via SVM (2nd degree polynomial kernel)
 library(kernlab)
 svmGrid2 = expand.grid(degree = 2, scale = 1, C = 77.4)
-model.svm2 = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
+model.svm2 = train(default ~ recover + coll_fee + interest + quality + int_rec + req,
                    data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2, metric = 'Max_Accuracy')
