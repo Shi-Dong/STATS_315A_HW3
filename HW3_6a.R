@@ -22,16 +22,21 @@ optThreshold <- function(data, lev = NULL, model = NULL){
 train.control = trainControl(method = 'repeatedcv', number = 10,
                              repeats = 3, classProbs = T,
                              summaryFunction = optThreshold,
-                             # down-sampling the data
+                             # up-sampling the data
                              sampling = 'up')
 # Relabel the data
 levels(data.train.normal$default) <- c('X0', 'X1')
 
+# Class weights
+class.weight <- ifelse(data.train.normal$default == 'X0',
+                       1/(table(data.train.normal$default)[1])*0.5,
+                       1/(table(data.train.normal$default)[2])*0.5)
+
 ### Train the model via glmnet
-glmGrid = expand.grid(alpha = 1, lambda = 10^seq(-7, -1, by = 1))
+glmGrid = expand.grid(alpha = 1, lambda = 1e-7)
 model.glmnet = train(default ~ ., data = data.train.normal,
                      method = 'glmnet', trControl = train.control,
-                     tuneGrid = glmGrid, 
+                     tuneGrid = glmGrid,
                      metric = 'Max_Accuracy')
 print('glmnet training complete!')
 
@@ -52,8 +57,17 @@ model.svm1 = train(default ~ ., data = data.train.normal,
                    tuneGrid = svmGrid1, metric = 'Max_Accuracy')
 print('radial SVM training complete!')
 
+### Train the model via SVM (radial kernel with class weights)
+# library(kernlab)
+# svmcwGrid1 = expand.grid(C = 9, sigma = 0.004, Weight = c(3,4,5,6,7,8))
+# set.seed(825)
+# model.svmcw1 = train(default ~ ., data = data.train.normal,
+#                    method = 'svmRadialWeights', trControl = train.control,
+#                    tuneGrid = svmcwGrid1, metric = 'Max_Accuracy')
+# print('radial SVM training complete!')
+
 ### Train the model via k-NN
-knnGrid = expand.grid(k = 5)
+knnGrid = expand.grid(k = 1:15)
 model.knn  = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
                    data = data.train.normal,
                    method = 'knn', trControl = train.control,
@@ -62,7 +76,7 @@ print('k-NN training complete!')
 
 ### Train the model via QDA
 set.seed(825)
-model.qda <- train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status, 
+model.qda <- train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status + reason + req, 
                    data = data.train.normal,
                    method = 'qda', trControl = train.control, metric = 'Max_Accuracy')
 print('QDA training complete!')
@@ -75,11 +89,10 @@ model.gam <- train(default ~ ., data = data.train.normal,
                    tuneGrid = gamGrid, metric = 'Max_Accuracy')
 print('GAM with smoothing splines training complete!')
 
-
 ### Train the model via SVM (2nd degree polynomial kernel)
 library(kernlab)
 svmGrid2 = expand.grid(degree = 2, scale = 1, C = 77.4)
-model.svm2 = train(default ~ recover + coll_fee + interest + quality + int_rec + req,
+model.svm2 = train(default ~ out_prncp + fees_rec + amount + interest + prin_rec + status,
                    data = data.train.normal,
                    method = 'svmPoly', trControl = train.control,
                    tuneGrid = svmGrid2, metric = 'Max_Accuracy')
